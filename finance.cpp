@@ -3,6 +3,8 @@
 #include<cmath>
 #include<vector>
 using namespace std;
+
+/*Matrix class not completed
 class Matrix{
 	public:
 	double ** matrix;
@@ -78,17 +80,16 @@ class Matrix{
 		
 	}
 
-};
-
+};*/
 
 
 
 class Annuity{
 	public:
-	bool annuityDue;
-	int nPer;
-	double discountRate;
-	double growthRate;
+	bool annuityDue; 
+	int nPer; //Number Of Periods For An Annuity
+	double discountRate; // 
+	double growthRate; //
 	double pV;
 	double payment;
 	double fV;
@@ -272,11 +273,74 @@ class CashFlow{
 	}
 };
 
-int main(){
-	Matrix * m=new Matrix(2,2);
-	m->addData(1,0,0)->addData(2,0,1)->addData(1,1,0)->addData(5,1,1);
-	Matrix * k=m->inverse();
-	k->print();
-	cout<<"\n";
-
+class Bond{
+	public:
+	int nPer;
+	int paymentsPerYear;
+	double couponRate;
+	double couponValue;
+	double purchasePrice;
+	double discountRate;
+	Annuity * bondAnnuity;
+	Bond(){
+		nPer=-1;
+		paymentsPerYear=-1;
+		couponRate=-1;
+		couponValue=-1;
+		discountRate=-1;
+		bondAnnuity=NULL;
+	}
+	Bond * setNPer(int nPer ){
+		this->nPer=nPer;
+		return this;
+	}
+	Bond * setPaymentsPerYear(char typeOfBond){
+		switch(typeOfBond){
+			case 'z': paymentsPerYear=0;
+					break;
+			case 'm': paymentsPerYear=12;
+					break;
+			case 'q': paymentsPerYear=4;
+					break;
+			case 's': paymentsPerYear=2;
+					break;
+			default: paymentsPerYear=1;
+					break;
+		}
+	}
+	Bond * setCouponRate(double couponRate){
+		this->couponRate=couponRate;
+		return this;
+	}
+	Bond * setDiscountRate(double discountRate){
+		this->discountRate=discountRate;
+		return this;
+	}
+	Bond * setCouponValue(double couponValue){
+		this->couponValue=couponValue;
+		return this;
+	}
+	Bond * setPurchasePrice(double purchasePrice){
+		this->purchasePrice=purchasePrice;
+		return this;
+	}
+	Bond * setBondAnnuity(){
+		if(nPer==-1||paymentsPerYear==-1||couponValue==-1||discountRate==-1){
+			cout<<"Could not create bond"<<endl;
+			return this;
+		}
+		bondAnnuity=new Annuity();
+		bondAnnuity->setNPer(nPer*paymentsPerYear)->setDiscountRate(discountRate/paymentsPerYear)->setPayment(couponValue*(couponRate)/100/paymentsPerYear)->setPV(0)->setFV(couponValue);
+	}
+double getCurrentValue(){
+		return bondAnnuity->getPV();
+	}
+	
+	
 };
+
+int main(){
+	Bond * b=new Bond();
+	b->setNPer(10)->setCouponRate(20)->setDiscountRate(30)->setCouponValue(100)->setPaymentsPerYear('q')->setBondAnnuity();
+	cout<<b->getCurrentValue()<<endl;
+	};
