@@ -32,7 +32,7 @@ class Matrix{
 	Matrix * addData(double * data,int xPosition){
 		if(xPosition>=xLength||xPosition<0){
 			cout<<"Could not add Data, outside of bounds"<<endl;
-			return this;
+			return this;		
 		}
 		for(int i=0;i<sizeof(data);i++){
 			matrix[xPosition][i]=data[i];
@@ -81,20 +81,22 @@ class Matrix{
 	}
 
 };*/
-
-
-
+//TODO: ADD a text file importer
+//TODO: ADD more encapsulation and methods
 class Annuity{
-	public:
+	private:
 	bool annuityDue; 
 	int nPer; //Number Of Periods For An Annuity
+	int startDate;
 	double discountRate; // 
 	double growthRate; //
 	double pV;
 	double payment;
 	double fV;
+	public:
 	Annuity(){
 		annuityDue=false;
+		startDate=0;
 		nPer=0;
 		discountRate=0;
 		growthRate=0;
@@ -126,9 +128,34 @@ class Annuity{
 		this->fV=fV;
 		return this;
 	}
+	Annuity * setStartDate(int startDate){
+		this->startDate=startDate;
+		return this;
+	}
 	Annuity * isAnnuityDue(){
 		this->annuityDue=true;
 		return this;
+	}
+	int getNPer(){
+			return nPer;
+	}
+	double getDiscountRate(){
+		return discountRate;
+	}
+	double getGrowthRate(){
+		return growthRate;
+	}
+	double getStartValue(){
+		return pV;
+	}
+	double getEndValue(){
+		return fV;
+	}
+	double getPayment(){
+		return payment;
+	}
+	int getStartDate(){
+			return startDate;
 	}
 	double getPV(){
 		double presentValueOfAnnuity=pV+payment*((1+growthRate)-pow(1/(1+discountRate/100.0),nPer))/((discountRate-growthRate)/100.0)+fV*pow((1/(1+discountRate/100.0)),nPer);
@@ -167,6 +194,7 @@ class Annuity{
 	}
 	void clear()
 	{
+		annuityDue=false;
 		nPer=0;
 		discountRate=0;
 		pV=0;
@@ -207,12 +235,22 @@ class CashFlow{
 		}
 		return this;
 	}
-	void setCashFlow(double cashInflow,int timePeriod){
+	void setCashFlowAt(double cashInflow,int timePeriod){
 		if(timePeriod>=cashFlow.size()){
-			cout<<"Could Not Add CashFlow"<<endl;
-			return;
+			for(int i=cashFlow.size();i<=timePeriod;i++){
+				cashFlow.push_back(0);
+			}
 		}
 		cashFlow[timePeriod]=cashInflow;
+	}
+	int getCashFlowLength(){
+		return cashFlow.size()-1;
+	}
+	double getCashFlowAt(int timePeriod){
+		if(timePeriod>=cashFlow.size()){
+			return 0;
+		}
+		return cashFlow[timePeriod];
 	}
 	double getNPV(){
 		double npV=0;
@@ -266,13 +304,13 @@ class CashFlow{
 	double getPI(){
 		return -1*getNPV()/cashFlow[0];
 	}
-	void printCashFlows(){
+	void print(){
 		for(int i=0;i<cashFlow.size();i++){
-			cout<<i+1<<". "<<cashFlow[i]<<endl;
+			cout<<i<<". "<<cashFlow[i]<<endl;
 		}
 	}
+	//TODO ADD a clearing function
 };
-
 class Bond{
 	public:
 	int nPer;
@@ -335,12 +373,172 @@ class Bond{
 double getCurrentValue(){
 		return bondAnnuity->getPV();
 	}
-	
-	
 };
 
+class Asset{
+	CashFlow * cashFlow;
+	double discountRate;
+	public:
+	Asset(){
+		cashFlow=new CashFlow();
+	}
+	Asset * setCashInFlow(double amount,int periodEnding){
+		cashFlow->setCashFlowAt(amount,periodEnding);
+		return this;
+	}
+	Asset * setDiscountRate(double discountRate){
+		this->discountRate=discountRate;
+		cashFlow->setDiscountRate(discountRate);
+		return this;
+	}
+	double getCashInFlowAt(int timePeriod){
+			return cashFlow->getCashFlowAt(timePeriod);
+	}
+	int getCashFlowLength(){
+		return cashFlow->getCashFlowLength();
+	}
+	double getPV(){
+		return cashFlow->getNPV();
+	}
+	void print(){
+		cashFlow->print();
+	}
+};
+class Liability{
+	private:
+	CashFlow * cashFlow;
+	double discountRate;
+	public:
+	Liability(){
+		cashFlow=new CashFlow();
+		discountRate=0;
+	}
+	Liability * setCashOutFlow(double amount,int periodEnding){
+		cashFlow->setCashFlowAt(-1*amount,periodEnding);
+		return this;
+	}
+	Liability * setDiscountRate(double discountRate){
+		this->discountRate=discountRate;
+		cashFlow->setDiscountRate(discountRate);
+		return this;
+	}
+	double getCashOutFlowAt(int timePeriod){
+			return cashFlow->getCashFlowAt(timePeriod);
+	}
+	int getCashFlowLength(){
+		return cashFlow->getCashFlowLength();
+	}
+	double getPV(){
+		return cashFlow->getNPV();
+	}
+	void print(){
+		cashFlow->print();
+	}
+};
+//TODO: ADD a Bond Portfolio Class
+class BondPortfolio{};
+//TODO: ADD a Stock Portfolio Class
+class StockPortfolio{};
+//TODO: ADD a Mortgage Class()
+//TODO: ADD A Portfolio Class
+class Portfolio{
+	StockPortfolio * stockPortfolio;
+	BondPortfolio * bondPortfolio;
+	vector<Asset *> assets;
+	vector<Liability *> liabilities;
+	public:
+	Portfolio(){};
+	Portfolio * addAsset(Asset * currentAsset){
+		assets.push_back(currentAsset);
+		return this;
+	}
+	Portfolio * addLiability(Liability * currentLiability){
+		liabilities.push_back(currentLiability);
+		return this;
+	}
+	void printData(){
+		int maxLength;
+		if(!assets.empty()){
+		maxLength=assets[0]->getCashFlowLength();
+		} else if(!liabilities.empty()){
+		maxLength=liabilities[0]->getCashFlowLength();
+		} else {
+			maxLength=0;
+		}
+		for(int i=0;i<assets.size();i++){
+			int currentCashFlowLength=assets[i]->getCashFlowLength();
+			if(maxLength<currentCashFlowLength){
+				maxLength=currentCashFlowLength;
+			}
+		}
+		for(int i=0;i<liabilities.size();i++){
+			int currentCashFlowLength=liabilities[i]->getCashFlowLength();
+			if(maxLength<currentCashFlowLength){
+				maxLength=currentCashFlowLength;
+			}
+		}
+		cout<<"Cash Flow Time Table"<<endl;
+		cout<<"Time Period"<<endl;
+		for(int i=0;i<=maxLength;i++){
+			cout<<"\t\t"<<i;
+		}
+		cout<<"\n";
+		cout<<"Assets"<<endl;
+		for(int i=0;i<assets.size();i++){
+			for(int j=0;j<=maxLength;j++){
+				cout<<"\t\t"<<assets[i]->getCashInFlowAt(j);
+			}
+			cout<<"\n\n";
+		}
+		cout<<"Liabilities";
+		cout<<"\n";
+		for(int i=0;i<liabilities.size();i++){
+			for(int j=0;j<=maxLength;j++){
+				cout<<"\t\t"<<liabilities[i]->getCashOutFlowAt(j);
+			}
+			cout<<"\n\n";
+		}
+		cout<<"Totals\n";
+		for(int i=0;i<=maxLength;i++){
+			double assetInFlowSum=0;
+			double liabilityOutFlowSum=0;
+			for(int j=0;j<assets.size();j++){
+				assetInFlowSum+=assets[j]->getCashInFlowAt(i);
+			}
+			for(int j=0;j<liabilities.size();j++){
+				liabilityOutFlowSum+=liabilities[j]->getCashOutFlowAt(i);
+			}
+			cout<<"\t\t"<<assetInFlowSum+liabilityOutFlowSum;
+		}
+		cout<<"\n\n";
+		
+		cout<<"Present Value Of Portfolio";
+		cout<<"\n";
+		double totalPresentValueAssets=0;
+		double totalPresentValueLiabilities=0;
+			for(int j=0;j<assets.size();j++){
+				totalPresentValueAssets+=assets[j]->getPV();
+			}
+			for(int j=0;j<liabilities.size();j++){
+				totalPresentValueLiabilities+=liabilities[j]->getPV();
+			}
+		cout<<totalPresentValueAssets+totalPresentValueLiabilities<<endl;
+	}
+};
+
+
 int main(){
-	Bond * b=new Bond();
-	b->setNPer(10)->setCouponRate(20)->setDiscountRate(30)->setCouponValue(100)->setPaymentsPerYear('q')->setBondAnnuity();
-	cout<<b->getCurrentValue()<<endl;
-	};
+	Portfolio * p=new Portfolio();
+	Asset * asset=new Asset();
+	Asset * asset2=new Asset();
+	Liability * liability= new Liability();
+	p->addAsset(asset);
+		p->addLiability(liability);
+	p->addAsset(asset2);
+	asset->setCashInFlow(14,0)->setCashInFlow(100,15)->setDiscountRate(5);
+	asset2->setCashInFlow(15,2)->setCashInFlow(100,5)->setDiscountRate(5);
+	liability->setCashOutFlow(3,1)->setCashOutFlow(45,9)->setDiscountRate(14);
+	p->printData();
+	return 0;
+}
+	
