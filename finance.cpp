@@ -3,86 +3,6 @@
 #include<cmath>
 #include<vector>
 using namespace std;
-
-/*Matrix class not completed
-class Matrix{
-	public:
-	double ** matrix;
-	int xLength;
-	int yLength;
-	Matrix(int n, int m){
-		xLength=n;
-		yLength=m;
-		matrix=new double *[n];
-		for(int i=0;i<n;i++){
-			matrix[i]=new double[m];
-			for(int j=0;j<m;j++){
-				matrix[i][j]=0;
-			}
-		}
-	}
-	Matrix * addData(double data,int xPosition,int yPosition){
-		if(xPosition>=xLength||xPosition<0||yPosition>=yLength||yPosition<0){
-			cout<<"Could not add Data, outside of bounds"<<endl;
-			return this;
-		}
-		matrix[xPosition][yPosition]=data;
-		return this;
-	}
-	Matrix * addData(double * data,int xPosition){
-		if(xPosition>=xLength||xPosition<0){
-			cout<<"Could not add Data, outside of bounds"<<endl;
-			return this;		
-		}
-		for(int i=0;i<sizeof(data);i++){
-			matrix[xPosition][i]=data[i];
-		}
-		return this;
-	}
-	Matrix * transpose(){
-		Matrix * transposedMatrix=new Matrix(yLength,xLength);
-		for(int i=0;i<xLength;i++){
-			for(int j=0;j<yLength;j++){
-				transposedMatrix->matrix[j][i]=matrix[i][j];
-			}
-		}
-		return transposedMatrix;
-	}
-	Matrix * multiply(Matrix * matrixB){
-		if(yLength!=matrixB->xLength){
-			cout<<"INVALID DIMENSIONS FOR MULTIPLICATION"<<endl;
-			return this;
-		}
-		Matrix * multipliedMatrix= new Matrix(xLength,matrixB->yLength);
-	for(int k=0;k<matrixB->yLength;k++){
-		for(int i=0;i<xLength;i++){
-			int rowValue=0;
-			for(int j=0;j<yLength;j++){
-				rowValue+=matrix[i][j]*matrixB->matrix[j][k];
-			}
-			multipliedMatrix->addData(rowValue,i,k);
-		}
-	}
-		return multipliedMatrix;
-	}
-	//TODO: MAKE AN INVERSE FUNCTION FOR A MATRIX
-	Matrix * inverse(){
-		
-	}
-	
-	void print(){
-		for(int i=0;i<xLength;i++){
-			for(int j=0;j<yLength;j++){
-				cout<<matrix[i][j]<<" ";
-			}
-			cout<<"\n";
-		}
-		
-	}
-
-};*/
-//TODO: ADD a text file importer
-//TODO: ADD more encapsulation and methods
 class Annuity{
 	private:
 	bool annuityDue; 
@@ -525,20 +445,3 @@ class Portfolio{
 		cout<<totalPresentValueAssets+totalPresentValueLiabilities<<endl;
 	}
 };
-
-
-int main(){
-	Portfolio * p=new Portfolio();
-	Asset * asset=new Asset();
-	Asset * asset2=new Asset();
-	Liability * liability= new Liability();
-	p->addAsset(asset);
-		p->addLiability(liability);
-	p->addAsset(asset2);
-	asset->setCashInFlow(14,0)->setCashInFlow(100,15)->setDiscountRate(5);
-	asset2->setCashInFlow(15,2)->setCashInFlow(100,5)->setDiscountRate(5);
-	liability->setCashOutFlow(3,1)->setCashOutFlow(45,9)->setDiscountRate(14);
-	p->printData();
-	return 0;
-}
-	
